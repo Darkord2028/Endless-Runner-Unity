@@ -9,6 +9,9 @@ public class Player : MonoBehaviour
     [SerializeField] private float laneChangeDuration = 0.3f;
     [SerializeField] private float jumpHeight = 2.5f;
     [SerializeField] private float gravity = -20.0f;
+    [SerializeField] private float slideDuration = 0.8f;
+    [SerializeField] private float SlideHeightMultiplier = 0.5f;
+    [SerializeField] private float CentreHeightYOffset = 0.5f;
 
     [Header("Lane Data")]
     [SerializeField] private Transform LeftTransform;
@@ -16,7 +19,7 @@ public class Player : MonoBehaviour
     [SerializeField] private Transform RightTransform;
 
     [Header("Ground Check")]
-    [SerializeField] private bool isPlayerGrounded = false;
+    [SerializeField] private bool isPlayerGrounded = false; // For Debug Purpose
     [SerializeField] private Transform GroundCheckPosition;
     [SerializeField] private float GroundCheckRadius = 0.3f;
     [SerializeField] private LayerMask GroundLayerMask;
@@ -25,13 +28,20 @@ public class Player : MonoBehaviour
     private Animator animator;
 
     private int CurrentLaneIndex = 1; // 0 = Left, 1 = Middle, 2 = Right
-    private bool isChangingLane = false;
+
     private float VerticalVelocity;
+    private float originalControllerHeight;
+
+    private bool isChangingLane = false;
+    private bool isSliding = false;
 
     void Start()
     {
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
+
+        originalControllerHeight = controller.height;
+
         transform.position = MiddleTransform.position;
         CurrentLaneIndex = 1;
     }
@@ -138,6 +148,30 @@ public class Player : MonoBehaviour
         animator.SetBool("Jumping", true);
     }
 
+    private void Slide()
+    {
+        if (isSliding || !IsGrounded()) return;
+
+        StartCoroutine(PerformSlide());
+    }
+
+    private IEnumerator PerformSlide()
+    {
+        isSliding = true;
+        controller.height = originalControllerHeight * SlideHeightMultiplier;
+        controller.center = new Vector3(controller.center.x, controller.center.y + CentreHeightYOffset, controller.center.z);
+
+        animator.SetBool("Sliding", true);
+
+        yield return new WaitForSeconds(slideDuration);
+
+        controller.height = originalControllerHeight;
+        controller.center = new Vector3(controller.center.x, controller.center.y - CentreHeightYOffset, controller.center.z);
+
+        isSliding = false;
+        animator.SetBool("Sliding", false);
+    }
+
     private bool IsGrounded()
     {
         Collider[] hitColliders = new Collider[5];
@@ -183,6 +217,15 @@ public class Player : MonoBehaviour
             Jump();
         }
     }
+
+    public void OnSlideInput(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            Slide();
+        }
+    }
+
 
     #endregion
 
