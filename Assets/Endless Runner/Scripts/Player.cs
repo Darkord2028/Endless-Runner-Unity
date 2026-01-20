@@ -20,9 +20,17 @@ public class Player : MonoBehaviour
 
     [Header("Ground Check")]
     [SerializeField] private bool isPlayerGrounded = false; // For Debug Purpose
-    [SerializeField] private Transform GroundCheckPosition;
+    [SerializeField] private Transform GroundCheckTransform;
     [SerializeField] private float GroundCheckRadius = 0.3f;
     [SerializeField] private LayerMask GroundLayerMask;
+
+    [Header("Obstacle Check")]
+    [SerializeField] private Transform ObstacleCheckTransform;
+    [SerializeField] private float RayDistance;
+    [SerializeField] private LayerMask ObstacleLayerMask;
+
+    [Header("Collectible")]
+    [SerializeField] private string CoinTag;
 
     private CharacterController controller;
     private Animator animator;
@@ -32,6 +40,7 @@ public class Player : MonoBehaviour
     private float VerticalVelocity;
     private float originalControllerHeight;
 
+    private bool isGameOver = false;
     private bool isChangingLane = false;
     private bool isSliding = false;
 
@@ -39,6 +48,8 @@ public class Player : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
+
+        isGameOver = false;
 
         originalControllerHeight = controller.height;
 
@@ -62,6 +73,14 @@ public class Player : MonoBehaviour
         VerticalVelocity += gravity * Time.deltaTime;
         Vector3 verticalMove = Vector3.up * VerticalVelocity * Time.deltaTime;
         controller.Move(forwardMove + verticalMove);
+    }
+
+    private void FixedUpdate()
+    {
+        if (IsCollidingWithObstacle() && !isGameOver)
+        {
+            isGameOver = true;
+        }
     }
 
     private void MoveRight()
@@ -172,12 +191,27 @@ public class Player : MonoBehaviour
         animator.SetBool("Sliding", false);
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag(CoinTag))
+        {
+            Debug.Log("Collided with " + other.gameObject.name);
+        }
+    }
+
+    private bool IsCollidingWithObstacle()
+    {
+        RaycastHit[] RayHit = new RaycastHit[1];
+        int hit = Physics.RaycastNonAlloc(ObstacleCheckTransform.position, Vector3.forward, RayHit, RayDistance, ObstacleLayerMask);
+        return hit > 0;
+    }
+
     private bool IsGrounded()
     {
         Collider[] hitColliders = new Collider[5];
 
         int hit = Physics.OverlapSphereNonAlloc(
-            GroundCheckPosition.position,
+            GroundCheckTransform.position,
             GroundCheckRadius,
             hitColliders,
             GroundLayerMask
@@ -189,7 +223,8 @@ public class Player : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireSphere(GroundCheckPosition.position, GroundCheckRadius);
+        Gizmos.DrawWireSphere(GroundCheckTransform.position, GroundCheckRadius);
+        Gizmos.DrawRay(ObstacleCheckTransform.position, Vector3.forward * RayDistance);
     }
 
     #region Input Functions
