@@ -4,24 +4,54 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
+    [Header("Player Data")]
+    [SerializeField] private float moveSpeed = 3.0f;
     [SerializeField] private float laneChangeDuration = 0.3f;
+    [SerializeField] private float jumpHeight = 2.5f;
+    [SerializeField] private float gravity = -20.0f;
 
+    [Header("Lane Data")]
     [SerializeField] private Transform LeftTransform;
     [SerializeField] private Transform MiddleTransform;
     [SerializeField] private Transform RightTransform;
 
+    [Header("Ground Check")]
+    [SerializeField] private bool isPlayerGrounded = false;
+    [SerializeField] private Transform GroundCheckPosition;
+    [SerializeField] private float GroundCheckRadius = 0.3f;
+    [SerializeField] private LayerMask GroundLayerMask;
+
+    private CharacterController controller;
+    private Animator animator;
+
     private int CurrentLaneIndex = 1; // 0 = Left, 1 = Middle, 2 = Right
     private bool isChangingLane = false;
+    private float VerticalVelocity;
 
     void Start()
     {
+        controller = GetComponent<CharacterController>();
+        animator = GetComponent<Animator>();
         transform.position = MiddleTransform.position;
         CurrentLaneIndex = 1;
     }
 
     void Update()
     {
-        
+        Vector3 forwardMove = transform.forward * moveSpeed * Time.deltaTime;
+
+        if (IsGrounded())
+        {
+            if (VerticalVelocity < 0)
+            {
+                VerticalVelocity = -2.0f;
+                animator.SetBool("Jumping", false);
+            }
+        }
+
+        VerticalVelocity += gravity * Time.deltaTime;
+        Vector3 verticalMove = Vector3.up * VerticalVelocity * Time.deltaTime;
+        controller.Move(forwardMove + verticalMove);
     }
 
     private void MoveRight()
@@ -66,17 +96,23 @@ public class Player : MonoBehaviour
     {
         isChangingLane = true;
 
-        Vector3 startPosition = transform.position;
         float elapsedTime = 0f;
+        float startPositionX = transform.position.x;
+        float targetPositionX = TargetPosition.x;
 
         while (elapsedTime < laneChangeDuration)
         {
-            transform.position = Vector3.Lerp(startPosition, TargetPosition, (elapsedTime / laneChangeDuration));
+            float newX = Mathf.Lerp(startPositionX, targetPositionX, (elapsedTime / laneChangeDuration));
+
+            Vector3 moveDelta = new Vector3(newX - transform.position.x, 0, 0);
+
+            controller.Move(moveDelta);
+
             elapsedTime += Time.deltaTime;
             yield return null;
         }
 
-        transform.position = TargetPosition;
+        controller.Move(new Vector3(targetPositionX - transform.position.x, 0, 0));
         isChangingLane = false;
     }
 
@@ -89,6 +125,37 @@ public class Player : MonoBehaviour
             2 => RightTransform.position,
             _ => transform.position,
         };
+    }
+
+    private void Jump()
+    {
+        if (!IsGrounded())
+        {
+            return;
+        }
+
+        VerticalVelocity = Mathf.Sqrt(jumpHeight * -2.0f * gravity);
+        animator.SetBool("Jumping", true);
+    }
+
+    private bool IsGrounded()
+    {
+        Collider[] hitColliders = new Collider[5];
+
+        int hit = Physics.OverlapSphereNonAlloc(
+            GroundCheckPosition.position,
+            GroundCheckRadius,
+            hitColliders,
+            GroundLayerMask
+        );
+
+        isPlayerGrounded = hit > 0;
+        return isPlayerGrounded;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(GroundCheckPosition.position, GroundCheckRadius);
     }
 
     #region Input Functions
@@ -106,6 +173,14 @@ public class Player : MonoBehaviour
             {
                 MoveRight();
             }
+        }
+    }
+
+    public void OnJumpInput(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            Jump();
         }
     }
 
