@@ -17,41 +17,34 @@ public class Chunk : MonoBehaviour
     [SerializeField] Transform[] coinPoints;
     [SerializeField] Transform[] obstaclePoints;
 
-    private List<GameObject> activeCoins = new List<GameObject>();
-
-    void Start()
-    {
-    }
-
-    void Update()
-    {
-        
-    }
+    //private List<GameObject> activeCoins = new List<GameObject>();
+    private List<GameObject> activeObstacles = new List<GameObject>();
 
     public void ActivateChunk()
     {
-        List<Vector3> positions = CoinPatterns.Straight(coinPoints[0].position, 10, 0.5f);
-
-        int currentCoinIndex = 0;
-
-        foreach (Vector3 pos in positions)
+        foreach (Transform obstaclePoint in obstaclePoints)
         {
-            GameObject coin = CoinPoolManager.instance.CoinPool.Get();
-            if (coin != null)
+            GameObject obstacle = ObstaclePoolManager.instance.GetRandomObstacle();
+
+            if (obstacle == null)
             {
-                coin.transform.position = pos;
-                activeCoins.Add(coin);
-                currentCoinIndex++;
+                Debug.Log("Cannot get obstacle from pool");
+                return;
             }
+
+            obstacle.transform.position = obstaclePoint.position;
+            obstacle.transform.rotation = obstaclePoint.rotation;
+            activeObstacles.Add(obstacle);
         }
     }
 
     public void DeactivateChunk()
     {
-        foreach(GameObject coin in activeCoins)
+        foreach (GameObject obstacle in activeObstacles)
         {
-            CoinPoolManager.instance.CoinPool.ReturnToPool(coin);
+            ObstaclePoolManager.instance.ReturnObstacleToPool(obstacle);
         }
+        activeObstacles.Clear();
     }
 
 }

@@ -26,7 +26,9 @@ public class Player : MonoBehaviour
 
     [Header("Obstacle Check")]
     [SerializeField] private Transform ObstacleCheckTransform;
-    [SerializeField] private float RayDistance;
+    [SerializeField] private float FrontRayDistance;
+    [SerializeField] private float SideRayDistance;
+    [SerializeField] private float obstacleCheckHeightOffset = 0.6f;
     [SerializeField] private LayerMask ObstacleLayerMask;
 
     [Header("Collectible")]
@@ -43,6 +45,12 @@ public class Player : MonoBehaviour
     private bool isGameOver = false;
     private bool isChangingLane = false;
     private bool isSliding = false;
+    [SerializeField] private bool isCollidingLeft = false;
+    [SerializeField] private bool isCollidingRight = false;
+
+    private RaycastHit[] frontRayHits = new RaycastHit[1];
+    private RaycastHit[] rightRayHits = new RaycastHit[1];
+    private RaycastHit[] leftRayHits = new RaycastHit[1];
 
     void Start()
     {
@@ -69,55 +77,38 @@ public class Player : MonoBehaviour
                 animator.SetBool("Jumping", false);
             }
         }
+        if (IsCollidingWithObstacleFront() && !isGameOver)
+        {
+            Debug.Log("Collided with Obstacle! Game Over!");
+            isGameOver = true;
+        }
+
+        isCollidingLeft = IsCollidingWithObstacleLeft();
+        isCollidingRight = IsCollidingWithObstacleRight();
 
         VerticalVelocity += gravity * Time.deltaTime;
         Vector3 verticalMove = Vector3.up * VerticalVelocity * Time.deltaTime;
         controller.Move(forwardMove + verticalMove);
     }
 
-    private void FixedUpdate()
-    {
-        if (IsCollidingWithObstacle() && !isGameOver)
-        {
-            isGameOver = true;
-        }
-    }
-
     private void MoveRight()
     {
-        if (CurrentLaneIndex == 2 || isChangingLane)
-        {
-            Debug.Log("Already in Right Lane");
-            return;
-        }
-        else if (CurrentLaneIndex == 1)
-        {
-            CurrentLaneIndex++;
-        }
-        else if (CurrentLaneIndex == 0)
-        {
-            CurrentLaneIndex = 1;
-        }
+        if (isChangingLane || CurrentLaneIndex >= 2) return;
 
+        // TODO:: Add Game Over on Right Obstacle Collision
+        if (IsCollidingWithObstacleRight()) return;
+
+        CurrentLaneIndex++;
         StartCoroutine(ChangeLane(GetTargetPosition()));
     }
 
     private void MoveLeft()
     {
-        if (CurrentLaneIndex == 0 || isChangingLane)
-        {
-            Debug.Log("Already in Left Lane");
-            return;
-        }
-        else if (CurrentLaneIndex == 1)
-        {
-            CurrentLaneIndex = 0;
-        }
-        else if (CurrentLaneIndex == 2)
-        {
-            CurrentLaneIndex = 1;
-        }
+        if (isChangingLane || CurrentLaneIndex <= 0) return;
 
+        if (IsCollidingWithObstacleLeft()) return;
+
+        CurrentLaneIndex--;
         StartCoroutine(ChangeLane(GetTargetPosition()));
     }
 
@@ -199,10 +190,21 @@ public class Player : MonoBehaviour
         }
     }
 
-    private bool IsCollidingWithObstacle()
+    private bool IsCollidingWithObstacleFront()
     {
-        RaycastHit[] RayHit = new RaycastHit[1];
-        int hit = Physics.RaycastNonAlloc(ObstacleCheckTransform.position, Vector3.forward, RayHit, RayDistance, ObstacleLayerMask);
+        int hit = Physics.RaycastNonAlloc(ObstacleCheckTransform.position + Vector3.up * obstacleCheckHeightOffset, Vector3.forward, frontRayHits, FrontRayDistance, ObstacleLayerMask);
+        return hit > 0;
+    }
+
+    private bool IsCollidingWithObstacleLeft()
+    {
+        int hit = Physics.RaycastNonAlloc(ObstacleCheckTransform.position + Vector3.up * obstacleCheckHeightOffset, Vector3.left, leftRayHits, SideRayDistance, ObstacleLayerMask);
+        return hit > 0;
+    }
+
+    private bool IsCollidingWithObstacleRight()
+    {
+        int hit = Physics.RaycastNonAlloc(ObstacleCheckTransform.position + Vector3.up * obstacleCheckHeightOffset, Vector3.right, rightRayHits, SideRayDistance, ObstacleLayerMask);
         return hit > 0;
     }
 
@@ -223,8 +225,11 @@ public class Player : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        Vector3 origin = ObstacleCheckTransform.position + Vector3.up * obstacleCheckHeightOffset;
         Gizmos.DrawWireSphere(GroundCheckTransform.position, GroundCheckRadius);
-        Gizmos.DrawRay(ObstacleCheckTransform.position, Vector3.forward * RayDistance);
+        Gizmos.DrawRay(origin, Vector3.forward * FrontRayDistance);
+        Gizmos.DrawRay(origin, -transform.right * SideRayDistance);
+        Gizmos.DrawRay(origin, transform.right * SideRayDistance);
     }
 
     #region Input Functions

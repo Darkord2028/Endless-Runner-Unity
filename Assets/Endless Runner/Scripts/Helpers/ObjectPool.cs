@@ -30,7 +30,10 @@ public class ObjectPool
 
     private GameObject CreateGameObject()
     {
-        return GameObject.Instantiate(objectToPool);
+        GameObject GO = GameObject.Instantiate(objectToPool);
+        PooledObject poolObject = GO.AddComponent<PooledObject>();
+        poolObject.originPool = this;
+        return GO;
     }
 
     public GameObject Get()

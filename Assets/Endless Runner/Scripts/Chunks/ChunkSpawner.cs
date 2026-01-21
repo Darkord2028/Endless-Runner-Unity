@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -43,13 +42,13 @@ public class ChunkSpawner : MonoBehaviour
         }
         else
         {
-            Debug.Log("Cannot get gameobject from chunkpool");
+            return;
         }
 
         Chunk chunk = GO.GetComponent<Chunk>();
         if (!chunk)
         {
-            Debug.Log("Chunk Component is missing!");
+            return;
         }
         
         chunk.ActivateChunk();
