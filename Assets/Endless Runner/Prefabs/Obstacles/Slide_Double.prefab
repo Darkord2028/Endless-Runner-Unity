@@ -284,7 +284,7 @@ GameObject:
   - component: {fileID: 5387245701767020779}
   m_Layer: 7
   m_Name: Slide_Double
-  m_TagString: Untagged
+  m_TagString: Obstacle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -329,8 +329,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.7244377, y: 3.1550984, z: 4.1377068}
-  m_Center: {x: -5.7499876, y: 1.4842157, z: 3.586319}
+  m_Size: {x: 0.5549331, y: 3.1550984, z: 4.1377068}
+  m_Center: {x: -5.8347397, y: 1.4842157, z: 3.586319}
 --- !u!65 &1695044356386648848
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -350,8 +350,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.67972684, y: 3.1550984, z: 3.9871674}
-  m_Center: {x: 1.6980668, y: 1.4842157, z: 3.550394}
+  m_Size: {x: 0.37786674, y: 3.1550984, z: 3.9871674}
+  m_Center: {x: 1.8489969, y: 1.4842157, z: 3.550394}
 --- !u!65 &5387245701767020779
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -371,8 +371,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 8.012588, y: 0.40353394, z: 4.035574}
-  m_Center: {x: -2.0272908, y: 3.339479, z: 3.5853777}
+  m_Size: {x: 8.012588, y: 0.21179008, z: 3.467188}
+  m_Center: {x: -2.0272908, y: 3.3393397, z: 3.5625067}
 --- !u!1 &5853915967067044496
 GameObject:
   m_ObjectHideFlags: 0

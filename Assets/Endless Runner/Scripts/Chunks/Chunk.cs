@@ -28,7 +28,6 @@ public class Chunk : MonoBehaviour
 
             if (obstacle == null)
             {
-                Debug.Log("Cannot get obstacle from pool");
                 return;
             }
 
@@ -36,6 +35,12 @@ public class Chunk : MonoBehaviour
             obstacle.transform.rotation = obstaclePoint.rotation;
             activeObstacles.Add(obstacle);
         }
+
+        foreach (Transform coinPoint in coinPoints)
+        {
+            // For future implementation of coin spawning patterns
+        }
+
     }
 
     public void DeactivateChunk()

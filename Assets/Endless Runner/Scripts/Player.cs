@@ -25,14 +25,18 @@ public class Player : MonoBehaviour
     [SerializeField] private LayerMask GroundLayerMask;
 
     [Header("Obstacle Check")]
+    [SerializeField] private string ObstacleTag;
     [SerializeField] private Transform ObstacleCheckTransform;
-    [SerializeField] private float FrontRayDistance;
     [SerializeField] private float SideRayDistance;
-    [SerializeField] private float obstacleCheckHeightOffset = 0.6f;
     [SerializeField] private LayerMask ObstacleLayerMask;
 
     [Header("Collectible")]
     [SerializeField] private string CoinTag;
+    [SerializeField] private int CoinValue = 1;
+
+
+    [Header("UI")]
+    [SerializeField] private GameObject GameOverPanel;
 
     private CharacterController controller;
     private Animator animator;
@@ -44,16 +48,17 @@ public class Player : MonoBehaviour
 
     private bool isGameOver = false;
     private bool isChangingLane = false;
+    private bool isGrounded = false;
     private bool isSliding = false;
-    [SerializeField] private bool isCollidingLeft = false;
-    [SerializeField] private bool isCollidingRight = false;
 
-    private RaycastHit[] frontRayHits = new RaycastHit[1];
+    private Collider[] groundedColliders = new Collider[5];
+
     private RaycastHit[] rightRayHits = new RaycastHit[1];
     private RaycastHit[] leftRayHits = new RaycastHit[1];
 
     void Start()
     {
+        Time.timeScale = 1f;
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
 
@@ -68,8 +73,9 @@ public class Player : MonoBehaviour
     void Update()
     {
         Vector3 forwardMove = transform.forward * moveSpeed * Time.deltaTime;
+        isGrounded = IsGrounded();
 
-        if (IsGrounded())
+        if (isGrounded)
         {
             if (VerticalVelocity < 0)
             {
@@ -77,14 +83,6 @@ public class Player : MonoBehaviour
                 animator.SetBool("Jumping", false);
             }
         }
-        if (IsCollidingWithObstacleFront() && !isGameOver)
-        {
-            Debug.Log("Collided with Obstacle! Game Over!");
-            isGameOver = true;
-        }
-
-        isCollidingLeft = IsCollidingWithObstacleLeft();
-        isCollidingRight = IsCollidingWithObstacleRight();
 
         VerticalVelocity += gravity * Time.deltaTime;
         Vector3 verticalMove = Vector3.up * VerticalVelocity * Time.deltaTime;
@@ -182,6 +180,13 @@ public class Player : MonoBehaviour
         animator.SetBool("Sliding", false);
     }
 
+    private void EndGame()
+    {
+        isGameOver = true;
+        GameOverPanel.SetActive(true);
+        Time.timeScale = 0f;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag(CoinTag))
@@ -190,32 +195,32 @@ public class Player : MonoBehaviour
         }
     }
 
-    private bool IsCollidingWithObstacleFront()
+    private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        int hit = Physics.RaycastNonAlloc(ObstacleCheckTransform.position + Vector3.up * obstacleCheckHeightOffset, Vector3.forward, frontRayHits, FrontRayDistance, ObstacleLayerMask);
-        return hit > 0;
+        if (hit.gameObject.CompareTag(ObstacleTag) && !isGameOver)
+        {
+            EndGame();
+        }
     }
 
     private bool IsCollidingWithObstacleLeft()
     {
-        int hit = Physics.RaycastNonAlloc(ObstacleCheckTransform.position + Vector3.up * obstacleCheckHeightOffset, Vector3.left, leftRayHits, SideRayDistance, ObstacleLayerMask);
+        int hit = Physics.RaycastNonAlloc(ObstacleCheckTransform.position, Vector3.left, leftRayHits, SideRayDistance, ObstacleLayerMask);
         return hit > 0;
     }
 
     private bool IsCollidingWithObstacleRight()
     {
-        int hit = Physics.RaycastNonAlloc(ObstacleCheckTransform.position + Vector3.up * obstacleCheckHeightOffset, Vector3.right, rightRayHits, SideRayDistance, ObstacleLayerMask);
+        int hit = Physics.RaycastNonAlloc(ObstacleCheckTransform.position, Vector3.right, rightRayHits, SideRayDistance, ObstacleLayerMask);
         return hit > 0;
     }
 
     private bool IsGrounded()
     {
-        Collider[] hitColliders = new Collider[5];
-
         int hit = Physics.OverlapSphereNonAlloc(
             GroundCheckTransform.position,
             GroundCheckRadius,
-            hitColliders,
+            groundedColliders,
             GroundLayerMask
         );
 
@@ -225,9 +230,8 @@ public class Player : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Vector3 origin = ObstacleCheckTransform.position + Vector3.up * obstacleCheckHeightOffset;
+        Vector3 origin = ObstacleCheckTransform.position;
         Gizmos.DrawWireSphere(GroundCheckTransform.position, GroundCheckRadius);
-        Gizmos.DrawRay(origin, Vector3.forward * FrontRayDistance);
         Gizmos.DrawRay(origin, -transform.right * SideRayDistance);
         Gizmos.DrawRay(origin, transform.right * SideRayDistance);
     }
