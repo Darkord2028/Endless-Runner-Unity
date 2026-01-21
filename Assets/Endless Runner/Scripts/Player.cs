@@ -2,6 +2,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 public class Player : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class Player : MonoBehaviour
     [SerializeField] private float slideDuration = 0.8f;
     [SerializeField] private float SlideHeightMultiplier = 0.5f;
     [SerializeField] private float CentreHeightYOffset = 0.5f;
+    [SerializeField] private float speedIncreaseRate = 0.1f;
+    [SerializeField] private float maxMoveSpeed = 15.0f;
 
     [Header("Lane Data")]
     [SerializeField] private Transform LeftTransform;
@@ -58,6 +61,8 @@ public class Player : MonoBehaviour
     private bool isGrounded = false;
     private bool isSliding = false;
 
+    private Vector2 touchStartPos;
+
     private Collider[] groundedColliders = new Collider[5];
 
     private RaycastHit[] rightRayHits = new RaycastHit[1];
@@ -82,6 +87,11 @@ public class Player : MonoBehaviour
         Vector3 forwardMove = transform.forward * moveSpeed * Time.deltaTime;
         isGrounded = IsGrounded();
 
+        if (!isGameOver)
+        {
+            moveSpeed += speedIncreaseRate * Time.deltaTime;
+            moveSpeed = Mathf.Min(moveSpeed, maxMoveSpeed);
+        }
         if (isGrounded)
         {
             if (VerticalVelocity < 0)
@@ -266,6 +276,25 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void OnTouchInput(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            touchStartPos = context.control.device
+                .TryGetChildControl<Vector2Control>("position")
+                .ReadValue();
+        }
+
+        if (context.canceled)
+        {
+            Vector2 touchEndPos = context.control.device
+                .TryGetChildControl<Vector2Control>("position")
+                .ReadValue();
+
+            DetectSwipe(touchStartPos, touchEndPos);
+        }
+    }
+
     public void OnJumpInput(InputAction.CallbackContext context)
     {
         if (context.performed)
@@ -279,6 +308,29 @@ public class Player : MonoBehaviour
         if (context.performed)
         {
             Slide();
+        }
+    }
+
+    private void DetectSwipe(Vector2 start, Vector2 end)
+    {
+        Vector2 delta = end - start;
+
+        if (delta.magnitude < 50f) // min swipe distance
+            return;
+
+        if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
+        {
+            if (delta.x > 0)
+                MoveRight();
+            else
+                MoveLeft();
+        }
+        else
+        {
+            if (delta.y > 0)
+                Jump();
+            else
+                Slide();
         }
     }
 
