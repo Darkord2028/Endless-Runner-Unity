@@ -100,6 +100,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2603175689955041918}
   - component: {fileID: 8960899360346789666}
+  - component: {fileID: 8789369909549169157}
   m_Layer: 8
   m_Name: Coin
   m_TagString: Coin
@@ -116,9 +117,9 @@ Transform:
   m_GameObject: {fileID: 8290017382542617230}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.14374, y: 1.97, z: 9.3}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4608165025713715894}
   m_Father: {fileID: 0}
@@ -144,3 +145,17 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.54649603, y: 0.5359459, z: 0.10822773}
   m_Center: {x: -0.0039324462, y: 0.0000014305115, z: 0.0052723885}
+--- !u!114 &8789369909549169157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8290017382542617230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ebc2a82d3bc12440a37ec15b9047a8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Coin
+  coinMesh: {fileID: 8055800485230894153}
+  rotationSpeed: 150

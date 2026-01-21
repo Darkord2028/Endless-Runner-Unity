@@ -1757,16 +1757,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65374065fbe7d6742b56da492e061bd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Chunk
-  coinPoints:
-  - {fileID: 8692589714406667770}
-  - {fileID: 4828109343592910305}
-  - {fileID: 3296444563423245326}
-  - {fileID: 7094101150358977388}
   obstaclePoints:
   - {fileID: 1432046748848480612}
   - {fileID: 8816194074609644447}
   - {fileID: 9097305454491412044}
   - {fileID: 783330996070747149}
+  coinSpawnHeight: 2
 --- !u!1 &4721682024281743752
 GameObject:
   m_ObjectHideFlags: 0

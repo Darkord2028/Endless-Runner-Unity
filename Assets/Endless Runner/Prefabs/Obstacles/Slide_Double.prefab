@@ -282,6 +282,7 @@ GameObject:
   - component: {fileID: 1041961521211206068}
   - component: {fileID: 1695044356386648848}
   - component: {fileID: 5387245701767020779}
+  - component: {fileID: -4330776987361180297}
   m_Layer: 7
   m_Name: Slide_Double
   m_TagString: Obstacle
@@ -373,6 +374,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 8.012588, y: 0.21179008, z: 3.467188}
   m_Center: {x: -2.0272908, y: 3.3393397, z: 3.5625067}
+--- !u!114 &-4330776987361180297
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2782284570118275882}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a8e0e8405d36bf4796963cd68ac04b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Obstacles
+  coinPattern: 3
 --- !u!1 &5853915967067044496
 GameObject:
   m_ObjectHideFlags: 0

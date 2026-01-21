@@ -100,6 +100,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6830224262802815616}
   - component: {fileID: 2858592485780758359}
+  - component: {fileID: 2366011486195244409}
   m_Layer: 7
   m_Name: JumpObstacle
   m_TagString: Obstacle
@@ -145,6 +146,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.9134254, y: 1.9168613, z: 1.1994553}
   m_Center: {x: 0.025123596, y: 0.6637708, z: -0.09972763}
+--- !u!114 &2366011486195244409
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3052513277471687975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a8e0e8405d36bf4796963cd68ac04b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Obstacles
+  coinPattern: 4
 --- !u!1 &6992480154358395870
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -34,14 +35,20 @@ public class Player : MonoBehaviour
     [SerializeField] private string CoinTag;
     [SerializeField] private int CoinValue = 1;
 
-
     [Header("UI")]
     [SerializeField] private GameObject GameOverPanel;
+    [SerializeField] private TextMeshProUGUI CoinText;
+
+    [Header("Audio")]
+    [SerializeField] private AudioClip CoinCollectSFX;
+    [SerializeField] private AudioClip JumpSFX;
+    [SerializeField] private AudioClip GameOverSFX;
 
     private CharacterController controller;
     private Animator animator;
 
     private int CurrentLaneIndex = 1; // 0 = Left, 1 = Middle, 2 = Right
+    private int CurrentCoinCount = 0;
 
     private float VerticalVelocity;
     private float originalControllerHeight;
@@ -154,6 +161,7 @@ public class Player : MonoBehaviour
 
         VerticalVelocity = Mathf.Sqrt(jumpHeight * -2.0f * gravity);
         animator.SetBool("Jumping", true);
+        AudioManager.Instance.PlaySFX(JumpSFX);
     }
 
     private void Slide()
@@ -182,6 +190,7 @@ public class Player : MonoBehaviour
 
     private void EndGame()
     {
+        AudioManager.Instance.PlaySFX(GameOverSFX);
         isGameOver = true;
         GameOverPanel.SetActive(true);
         Time.timeScale = 0f;
@@ -191,7 +200,10 @@ public class Player : MonoBehaviour
     {
         if (other.gameObject.CompareTag(CoinTag))
         {
-            Debug.Log("Collided with " + other.gameObject.name);
+            other.gameObject.SetActive(false);
+            AudioManager.Instance.PlaySFX(CoinCollectSFX);
+            CurrentCoinCount += CoinValue;
+            CoinText.text = CurrentCoinCount.ToString();
         }
     }
 

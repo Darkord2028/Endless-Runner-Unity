@@ -1,45 +1,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum CoinSpawnPattern
-{
-    STRAIGHT,
-    ZIGZAG,
-    ALLLANES,
-    JUMPARC,
-    RANDOMSPARSE,
-    WAVE
-}
-
 public class Chunk : MonoBehaviour
 {
     [Header("Spawn Points")]
-    [SerializeField] Transform[] coinPoints;
     [SerializeField] Transform[] obstaclePoints;
+    [SerializeField] float coinSpawnHeight = 5.0f;
 
-    //private List<GameObject> activeCoins = new List<GameObject>();
+    private List<GameObject> activeCoins = new List<GameObject>();
     private List<GameObject> activeObstacles = new List<GameObject>();
 
     public void ActivateChunk()
     {
         foreach (Transform obstaclePoint in obstaclePoints)
         {
-            GameObject obstacle = ObstaclePoolManager.instance.GetRandomObstacle();
+            GameObject obstacleGO = ObstaclePoolManager.instance.GetRandomObstacle();
 
-            if (obstacle == null)
+            if (!obstacleGO)
             {
                 return;
             }
 
-            obstacle.transform.position = obstaclePoint.position;
-            obstacle.transform.rotation = obstaclePoint.rotation;
-            activeObstacles.Add(obstacle);
+            obstacleGO.transform.position = obstaclePoint.position;
+            obstacleGO.transform.rotation = obstaclePoint.rotation;
+            activeObstacles.Add(obstacleGO);
         }
 
-        foreach (Transform coinPoint in coinPoints)
-        {
-            // For future implementation of coin spawning patterns
-        }
+        SpawnCoins();
 
     }
 
@@ -49,7 +36,39 @@ public class Chunk : MonoBehaviour
         {
             ObstaclePoolManager.instance.ReturnObstacleToPool(obstacle);
         }
+        foreach (GameObject coin in activeCoins)
+        {
+            CoinPoolManager.instance.CoinPool.ReturnToPool(coin);
+        }
         activeObstacles.Clear();
+        activeCoins.Clear();
+    }
+
+    private void SpawnCoins()
+    {
+        foreach (GameObject GO in activeObstacles)
+        {
+            Obstacles obstacle = GO.GetComponent<Obstacles>();
+            if (!obstacle || obstacle.coinPattern == CoinPatterns.NONE)
+            {
+                continue;
+            }
+
+            List<Vector3> coinPositions = CoinPatternsLibrary.GetPattern(obstacle.coinPattern, GO.transform, 1, 10);
+            
+            foreach (Vector3 pos in coinPositions)
+            {
+                GameObject coinGO = CoinPoolManager.instance.CoinPool.Get();
+                if (!coinGO)
+                {
+                    return;
+                }
+                coinGO.transform.position = pos + Vector3.up * coinSpawnHeight;
+                coinGO.transform.rotation = Quaternion.identity;
+                activeCoins.Add(coinGO);
+            }
+
+        }
     }
 
 }

@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 7937195604257307829}
   - component: {fileID: 4280450698928399948}
   - component: {fileID: 8450488156380436656}
+  - component: {fileID: -693355266046587588}
   m_Layer: 7
   m_Name: OneWayAlley
   m_TagString: Obstacle
@@ -164,6 +165,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.2476912, y: 4.509997, z: 1.012748}
   m_Center: {x: 3.782936, y: 2.2513645, z: -2.614458}
+--- !u!114 &-693355266046587588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7682876249773515787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a8e0e8405d36bf4796963cd68ac04b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Obstacles
+  coinPattern: 1
 --- !u!1 &8480707377690837666
 GameObject:
   m_ObjectHideFlags: 0

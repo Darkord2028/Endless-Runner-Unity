@@ -497,6 +497,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3046879493146313256}
   - component: {fileID: 1153056775062064152}
+  - component: {fileID: 6906332743405121198}
   m_Layer: 7
   m_Name: BarrelBlock_Double
   m_TagString: Obstacle
@@ -542,6 +543,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.89263, y: 4.3715706, z: 1}
   m_Center: {x: -0.07756692, y: 2.2132397, z: 0}
+--- !u!114 &6906332743405121198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4577134370789652511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a8e0e8405d36bf4796963cd68ac04b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Obstacles
+  coinPattern: 3
 --- !u!1 &4680991015449089847
 GameObject:
   m_ObjectHideFlags: 0
